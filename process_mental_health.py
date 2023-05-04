@@ -107,10 +107,10 @@ print(output)
 # West Virginia                  0                 1          0          2          0           0      2    17/5 = 3.4
 # Wisconsin                      1                 2          3          0          1           0      1    31/8 = 3.88
 
-# phq9_9          More than half of the days  Nearly every day  Not at all  Several days
+# phq9_9          More than half of the days(Sometimes)  Nearly every day(Often)  Not at all(Never)  Several days(Rarely)
 # state_1                                                                               
-# Alabama                                  0                 0           3             0
-# Alaska                                   0                 0           2             0
+# Alabama                                  0                 0           3             0   
+# Alaska                                   0                 0           2             0  
 # Arizona                                  0                 0           8             2
 # Arkansas                                 0                 0           2             0
 # California                               6                 3          55            12

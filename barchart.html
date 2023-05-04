@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Bar chart of Social Media Times</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+		</style>
+	</head>
+        <h2 style="padding-left: 160px;">Social Media Usage by Age and Its Effect</h2>
+        <svg id="seq1" width="450" height="18" ></svg>
+        <p>Range Used Below of Negative to Positive Effect</p>
+	<body>
+		<script type="text/javascript">
+
+			let w = 1000;
+			let h = 800;
+			let barPadding =20;
+			
+			let svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+            let color = d3.scaleQuantize()
+                        .range(["red","tomato","orangered","blueviolet","blue"]);
+            
+
+            d3.csv("bar.csv").then( (dataset) => {
+                console.log(dataset)
+
+                color.domain([
+                                d3.min(dataset, (d)=> { return d.Effect; }), 
+                                d3.max(dataset, (d)=> { return d.Effect; })
+				]);
+
+                svg.selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("x", (d, i)=> {
+                        return (150*(i)+100);
+                })
+                .attr("y", (d, i)=> {
+                        return (h/2 + barPadding) - 100*d.Average;
+                })
+                .attr("width", 150)
+                .attr("height", (d, i)=> {
+                        return 100*d.Average;
+                })
+                .style("fill", (d)=> {
+                                let effect = d.Effect;
+                                console.log(d.Effect);
+                                
+                                if (effect) {
+                                        console.log(color(effect*10000));
+                                        return color(effect);
+                                } else {
+                                        return "blue";
+                                }
+					   });
+
+                svg.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .attr("class", "most label")
+                .text((d)=> {return "Most: " + d.Most;})
+                .attr("x",(d, i)=> {
+                        return (150*(i)+100);
+                })
+                .attr("y", (d, i)=> {
+                        return (h/2 + barPadding) - 100*d.Average + 25;
+                })
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "19px")
+                .attr("font-weight", "bold")
+                .attr("fill", "white");
+
+                svg.append("text")
+                .attr("class", "least label")
+                .text((d)=> {return "Least: LinkedIn";})
+                .attr("x",100)
+                .attr("y",190)
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "18px")
+                .attr("font-weight", "bold")
+                .attr("fill", "white");
+
+                svg.append("text")
+                .attr("class", "least label")
+                .text((d)=> {return "Least: LinkedIn";})
+                .attr("x",250)
+                .attr("y",215)
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "18px")
+                .attr("font-weight", "bold")
+                .attr("fill", "white");
+
+                svg.append("text")
+                .attr("class", "least label")
+                .text((d)=> {return "Least: YouTube";})
+                .attr("x",400)
+                .attr("y",265)
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "18px")
+                .attr("font-weight", "bold")
+                .attr("fill", "white");
+
+                svg.append("text")
+                .attr("class", "least label")
+                .text((d)=> {return "Least: LinkedIn";})
+                .attr("x",550)
+                .attr("y",310)
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "18px")
+                .attr("font-weight", "bold")
+                .attr("fill", "white");
+
+                       
+                let xScale = d3.scaleBand()
+                                .domain(dataset.map(d => d.Age))
+                                .range([50, 750])
+                                .padding(0.5)
+
+                let yScale = d3.scaleLinear()
+                                .domain([0, 4])
+                                .range([(h/2 + barPadding), barPadding])
+
+                let xAxis = d3.axisBottom()
+                        .scale(xScale)
+                        .ticks(4);
+
+                let tickLabels = ['0','< 2 hrs','2 - 3 hrs','3 - 6 hrs','6 - 8 hrs'];
+
+                let yAxis = d3.axisLeft()
+                        .scale(yScale)
+                        .ticks(5)
+                        .tickFormat((d,i) => tickLabels[i]);
+
+                svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(0," + (h/2 + barPadding) + ")")
+                        .call(xAxis);
+                
+                svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + 50 + ",0)")
+                        .call(yAxis);
+
+
+            });
+
+            let colorA = "red", colorB = "blue";
+
+            function drawScale(id, interpolator) {
+                var data = Array.from(Array(100).keys());
+
+                var cScale = d3.scaleSequential()
+                        .interpolator(interpolator)
+                        .domain([0,99]);
+
+                var xScale = d3.scaleLinear()
+                        .domain([0,99])
+                        .range([0, 300]);
+
+                var u = d3.select("#" + id)
+                        .selectAll("rect")
+                        .data(data)
+                        .enter()
+                        .append("rect")
+                        .attr("x", (d) => Math.floor(xScale(d)))
+                        .attr("y", 0)
+                        .attr("height", 40)
+                        .attr("width", (d) => {
+                        if (d == 99) {
+                                return 6;
+                        }
+                        return Math.floor(xScale(d+1)) - Math.floor(xScale(d)) + 1;
+                        })
+                        .attr("fill", (d) => cScale(d));
+                }
+
+            drawScale("seq1", d3.interpolate(colorA, colorB));
+        //     Using code from http://using-d3js.com/04_05_sequential_scales.html for the scale
+			
+		</script>
+	</body>
+</html>

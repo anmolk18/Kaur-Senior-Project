@@ -11,21 +11,17 @@
 	<body>
 		<script type="text/javascript">
 
-			//Width and height
 			let w = 800;
 			let h = 400;
 			let padding = 50;
 
-            //Create SVG element
             let svg = d3.select("body")
                             .append("svg")
                             .attr("width", w)
                             .attr("height", h);
 
-			//Create circles
             d3.csv("Instagram_Suicidality.csv").then ( (dataset) => {
 
-                //Create scale functions
                 let xScale = d3.scaleLinear()
                                     .domain([0, 2])
                                     .range([padding, w - padding * 4]);
@@ -33,12 +29,10 @@
                                     .domain([15, 23])
                                     .range([h - padding, padding]);
 
-                //Define X axis
                 let xAxis = d3.axisBottom()
                                 .scale(xScale)
                                 .ticks(2);
 
-                //Define Y axis
                 let yAxis = d3.axisLeft()
                                 .scale(yScale)
                                 .ticks(4);
@@ -60,12 +54,10 @@
                         else {return "blue";}})
                     .on("click", function(event,d) {
 
-                        //Get this circles x/y values, then augment for the tooltip
                         let xPosition = parseFloat(d3.select(this).attr("cx"));
                         let yPosition = parseFloat(d3.select(this).attr("cy"));
 
 
-                        //Create the tooltip label
                         svg.append("text")
                         .attr("id", "tooltip")
                         .attr("x", xPosition)
@@ -80,18 +72,15 @@
                         })
                     .on("mouseout", function() {
 
-                        //Remove the tooltip
                         d3.select("#tooltip").remove();
 
                         });
 
-                //Create X axis
                 svg.append("g")
                     .attr("class", "axis")
                     .attr("transform", "translate(0," + (h - padding) + ")")
                     .call(xAxis);
                 
-                //Create Y axis
                 svg.append("g")
                     .attr("class", "axis")
                     .attr("transform", "translate(" + padding + ",0)")
@@ -105,26 +94,26 @@
 
                 svg.append('circle')
                     .attr('cx', 55)
-                    .attr('cy', 375)
+                    .attr('cy', 370)
                     .attr('r', 2)
                     .attr('fill', 'red');
                 
                 svg.append("text")
                     .attr("x", 60)
-                    .attr("y", 380)
+                    .attr("y", 375)
                     .style("font-size", "16px")
                     .text("Attempted")
                     .attr("fill", "red")
                 
                 svg.append('circle')
                     .attr('cx', 56)
-                    .attr('cy', 395)
+                    .attr('cy', 390)
                     .attr('r', 2)
                     .attr('fill', 'blue');
                 
                 svg.append("text")
                     .attr("x", 60)
-                    .attr("y", 400)
+                    .attr("y", 395)
                     .style("font-size", "16px")
                     .text("Didn't Attempt")
                     .attr("fill", "blue")
@@ -146,5 +135,6 @@
                     .text("Age");
             })
 		</script>
-	</body>
+	</body><br><br>
+    <h3>View the Fourth Visualization <a href="barchart.html">here</a>.</h3>
 </html>

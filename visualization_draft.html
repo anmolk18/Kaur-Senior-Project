@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<!-- I tried creating a zoomed in version of the geographic visualization but it was not useful
+because the coordinates are set in the json file, so I could not zoom in on that section -->
 <html lang="en">
 	<head>
 		<meta charset="utf-8">
@@ -24,61 +26,43 @@
 	<div class="home"></div>
 	<body>
 		<script type="text/javascript">
-            
-            //Using general health for color 
 
-			//Width and height
 			let w = 500;
 			let h = 300;
 
-			//Define map projection
 			let projection = d3.geoAlbersUsa()
 								   .translate([w/2, h/2])
 								   .scale([500]);
 
-			//Define path generator
 			let path = d3.geoPath()
 							 .projection(projection);
-							 
-			//Define quantize scale to sort data values into buckets of color
 			let color = d3.scaleQuantize()
 								.range(["rgb(237,248,233)","rgb(186,228,179)","rgb(116,196,118)","rgb(49,163,84)","rgb(0,109,44)"]);
-								//Colors taken from colorbrewer.js, included in the D3 download
 
-			//Number formatting for Taxes values
-			let formatAsThousands = d3.format(",");  //e.g. converts 123456 to "123,456"
-
-			//Create SVG element
 			let svg = d3.select("body")
 						.append("svg")
 						.attr("width", w + 200)
 						.attr("height", h);
 
-			//Load in income data
-			d3.csv("states_health.csv").then( (data)=> {
+			d3.csv("states_health2.csv").then( (data)=> {
                 console.log(data)
 
-				//Set input domain for color scale
 				color.domain([
 					d3.min(data, (d)=> { return d.value; }), 
 					d3.max(data, (d)=> { return d.value; })
 				]);
 
-				//Load in GeoJSON data
-				d3.json("us-states.json").then( function(json) {
+				d3.json("us-states2.json").then( function(json) {
 
 					const tooltip = d3.select(".home").append("div")
 						.attr("class", "tooltip")
 						.style("opacity", 0);
 
-					//Merge the income data and GeoJSON
-					//Loop through once for each income data value
 					for (let i = 0; i < data.length; i++) {
 				
 						let dataState = data[i].state;				//Grab state name
 						let dataValue = parseFloat(data[i].value);	//Grab data value, and convert from string to float
 				
-						//Find the corresponding state inside the GeoJSON
 						for (let j = 0; j < json.features.length; j++) {
 						
 							let jsonState = json.features[j].properties.name;
@@ -93,7 +77,6 @@
 						}		
 					}
 
-					//Bind data and create one path per GeoJSON feature
 					svg.selectAll("path")
 					   .data(json.features)
 					   .enter()
@@ -126,27 +109,9 @@
 							tooltip.transition()
 								.duration(200)
 								.style("opacity", .9)
-						//Any time the mouse moves, the tooltip should be at the same position
-						//The text inside should be State: rate%
 								.text(()=> `Average Times Thought: ${d.properties.value} times`);
 						})
-							//Create the tooltip label
-							// svg.append("text")
-							// .attr("id", "tooltip")
-							// .attr("x", 240)
-							// .attr("y", 30)
-							// .attr("text-anchor", "middle")
-							// .attr("font-family", "sans-serif")
-							// .attr("font-size", "12px")
-							// .attr("font-weight", "bold")
-							// .attr("fill", "blue")
-							// .text((d) => {
-							// 	console.log("here");
-							// 	console.log(d);
-							// 	return "Average Times Thought: " + d.properties.value + " times";
-							// });
 
-						// })
 						.on("mouseout", (d, i)=> {
 							d3.select("#tooltip").remove();
 							d3.select(event.currentTarget).style("fill", (d)=> {
@@ -160,7 +125,7 @@
 
 			
 
-					d3.csv("statecentroids.csv").then( (data)=> {
+					d3.csv("statecentroids2.csv").then( (data)=> {
 						
 						svg.selectAll("circle")
 						   .data(data)
@@ -181,7 +146,6 @@
 								let xPosition = parseFloat(d3.select(this).attr("cx"));
 								let yPosition = parseFloat(d3.select(this).attr("cy"));
 
-								//Create the tooltip label
 								svg.append("text")
 								.attr("id", "tooltip")
 								.attr("x", xPosition + 100)
@@ -196,7 +160,6 @@
 								})
 							.on("mouseout", function() {
 
-								//Remove the tooltip
 								d3.select("#tooltip").remove();
 
 								})
