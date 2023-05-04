@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Scatterplot Instagram</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			
+			p {
+				display: inline-block;
+			}
+
+			input {
+				height: 30px;
+				width: 250px;
+			}
+
+		</style>
+	</head>
+	<body>
+        
+        <h3>Scatterplot of Number of Mean Likes by Number of Instagram Followers</h3>
+        <svg width="1000" height="350" id="svg1"></svg>
+        <p>
+            <h4>Slide for Age (0 - 30 years)</h4>
+			<input id="slider" type="range" min="0" max="30" step="1" value="0" orient="horizontal">
+            <h5>Click on the circle in the scatterplot to see (Age, Number of Instagram followers, Number of Mean Likes) when available</h5>
+		</p>
+			
+		<script type="text/javascript">
+
+
+			//Width and height
+			let w = 1000;
+			let h = 300;
+
+
+            d3.csv("Instagram_Suicidality.csv").then ( (dataset) => {
+                let svg1 = d3.select("#svg1");
+
+                
+                //Width and height
+                let w = 1200;
+                let h = 320;
+                let padding = 60;
+
+                    //Create scale functions
+                let xScale1 = d3.scaleLog()
+                                    .domain([1, 4000])
+                                    .range([padding, w - padding - 300 * 2]);
+                let yScale1 = d3.scaleLinear()
+                                    .domain([0, 400])
+                                    .range([h - padding, 10]);
+
+                //Define X axis
+                let xAxis = d3.axisBottom()
+                                .scale(xScale1)
+                                .ticks(5);
+
+                //Define Y axis
+                let yAxis = d3.axisLeft()
+                                .scale(yScale1)
+                                .ticks(5);
+
+                svg1.selectAll("circle")
+                    .data(dataset)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", (d)=> {
+                            return xScale1(d.Number_Followers_Instagram);
+                    })
+                    .attr("cy", (d)=> {
+                            return yScale1(d.Mean_likes_Instagram);
+                    })
+                    .attr("r", 1.5)
+                    .attr("fill", (d)=> {
+                                if (d.Lifetime_Suicide_Attempt == '1.00') {
+                                    return "red";}
+                                else {return "black";};
+                            })
+                    .on("click", function(event,d) {
+                        //Get this circles x/y values, then augment for the tooltip
+                        let xPosition = parseFloat(d3.select(this).attr("cx"));
+                        let yPosition = parseFloat(d3.select(this).attr("cy"));
+
+
+                        //Create the tooltip label
+                        svg1.append("text")
+                        .attr("id", "tooltip")
+                        .attr("x", xPosition)
+                        .attr("y", yPosition-25)
+                        .attr("text-anchor", "middle")
+                        .attr("font-family", "sans-serif")
+                        .attr("font-size", "24px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "red")
+                        .text(d.Age + ", " + Number(d.Number_Followers_Instagram) + ", " + d.Mean_likes_Instagram);
+
+                        })
+                    .on("mouseout", function() {
+
+                        //Remove the tooltip
+                        d3.select("#tooltip").remove();
+
+                        });
+                
+                //Create X axis
+                svg1.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + (h - padding) + ")")
+                    .call(xAxis);
+                
+                //Create Y axis
+                svg1.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+                
+                svg1.append("text")
+                    .attr("x", 200)
+                    .attr("y", 310)
+                    .attr("font-size", "18px")
+                    .text("Number of Instagram Followers")
+                    
+                svg1.append("text")
+                    .attr("x", -290)
+                    .attr("y", 12)
+                    .attr("font-size", "18px")
+                    .attr("transform", "rotate(-90)")
+                    .text("Number of Mean Likes on Instagram")
+
+
+                svg1.append('circle')
+                    .attr('cx', 55)
+                    .attr('cy', 295)
+                    .attr('r', 2)
+                    .attr('fill', 'red');
+                
+                svg1.append("text")
+                    .attr("x", 60)
+                    .attr("y", 300)
+                    .style("font-size", "16px")
+                    .text("Attempted")
+                    .attr("fill", "red")
+                
+                svg1.append('circle')
+                    .attr('cx', 56)
+                    .attr('cy', 315)
+                    .attr('r', 2)
+                    .attr('fill', 'black');
+                
+                svg1.append("text")
+                    .attr("x", 60)
+                    .attr("y", 320)
+                    .style("font-size", "16px")
+                    .text("Didn't Attempt")
+                    .attr("fill", "clack")
+
+                d3.select("input")
+                    .on("change", function() {
+
+                        let threshold = d3.select(this).node().value;
+
+
+                        svg1.selectAll("circle")
+                            .attr("r", (d)=> {
+                                if (Number(d.Age) <= Number(threshold)) {
+                                    return "3";}
+                                else {return "1.5";};
+                            });
+                        
+
+                    });
+
+
+
+                
+                })
+
+			
+		</script>
+	</body>
+</html>

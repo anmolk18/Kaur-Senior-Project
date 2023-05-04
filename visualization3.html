@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Bar chart of Social Media Times</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+		</style>
+	</head>
+	<body>
+                <h2 style="padding-left: 150px;">Social Media Usage by Age</h2>
+		<script type="text/javascript">
+
+			//Width and height
+			let w = 1000;
+			let h = 800;
+			let barPadding =20;
+			
+			//Create SVG element
+			let svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+            let color = d3.scaleQuantize()
+                        .range(["red","lightred","indianred","skyblue","blue"]);
+            
+
+            d3.csv("bar.csv").then( (dataset) => {
+                console.log(dataset)
+
+                color.domain([
+					d3.min(dataset, (d)=> { return d.Effect; }), 
+					d3.max(dataset, (d)=> { return d.Effect; })
+				]);
+
+                svg.selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("x", (d, i)=> {
+                        return (150*(i)+100);
+                })
+                .attr("y", (d, i)=> {
+                        return (h/2 + barPadding) - 100*d.Average;
+                })
+                .attr("width", 150)
+                .attr("height", (d, i)=> {
+                        return 100*d.Average;
+                })
+                .style("fill", (d)=> {
+                                let effect = d.Effect;
+                                console.log(d.Effect);
+                                
+                                if (effect) {
+                                        console.log(color(effect*10000));
+                                        return color(effect);
+                                } else {
+                                        return "blue";
+                                }
+					   })
+                    .on("mouseout", function() {
+
+                        //Remove the tooltip
+                        d3.select("#tooltip").remove();
+
+                        })
+                        .on("click", function(event,d) {
+
+                                let xPosition = parseFloat(d3.select(this).attr("x"));
+                                let yPosition = parseFloat(d3.select(this).attr("y"));
+
+
+                                //Create the tooltip label
+                                svg.append("text")
+                                .attr("id", "tooltip")
+                                .attr("x", xPosition + 70)
+                                .attr("y", yPosition-20)
+                                .attr("text-anchor", "middle")
+                                .attr("font-family", "sans-serif")
+                                .attr("font-size", "14px")
+                                .attr("font-weight", "bold")
+                                .attr("fill", "black")
+                                .text("Least Helpful: " + d.Least);
+
+                                })
+                                .on("mouseout", function() {
+
+                                //Remove the tooltip
+                                d3.select("#tooltip").remove();
+
+                                });
+
+                svg.selectAll("text")
+                .data(dataset)
+                .enter()
+                .append("text")
+                .text((d)=> {return "Most: " + d.Most + "; Least: " + d.Least;})
+                .attr("x",(d, i)=> {
+                        return (150*(i)+100);
+                })
+                .attr("y", (d, i)=> {
+                        return (h/2 + barPadding) - 100*d.Average + 10;
+                })
+                .attr("font-family", "sans-serif")
+                .attr("font-size", "10px")
+                .attr("font-weight", "bold")
+                .attr("fill", "black");
+
+                       
+                let xScale = d3.scaleBand()
+                                .domain(dataset.map(d => d.Age))
+                                .range([50, 750])
+                                .padding(0.5)
+
+                let yScale = d3.scaleLinear()
+                                .domain([0, 4])
+                                .range([(h/2 + barPadding), barPadding])
+
+                //Define X axis
+                let xAxis = d3.axisBottom()
+                        .scale(xScale)
+                        .ticks(4);
+
+                let tickLabels = ['0','< 2 hrs','2 - 3 hrs','3 - 6 hrs','6 - 8 hrs'];
+
+                //Define Y axis
+                let yAxis = d3.axisLeft()
+                        .scale(yScale)
+                        .ticks(5)
+                        .tickFormat((d,i) => tickLabels[i]);
+
+                svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(0," + (h/2 + barPadding) + ")")
+                        .call(xAxis);
+                
+                //Create Y axis
+                svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + 50 + ",0)")
+                        .call(yAxis);
+
+
+            });
+
+        //     let colorA = "red", colorB = "darksalmon";
+
+        //     function drawScale(id, interpolator) {
+        //         var data = Array.from(Array(100).keys());
+
+        //         var cScale = d3.scaleSequential()
+        //                 .interpolator(interpolator)
+        //                 .domain([0,99]);
+
+        //         var xScale = d3.scaleLinear()
+        //                 .domain([0,99])
+        //                 .range([0, 580]);
+
+        //         var u = d3.select("#" + id)
+        //                 .selectAll("rect")
+        //                 .data(data)
+        //                 .enter()
+        //                 .append("rect")
+        //                 .attr("x", (d) => Math.floor(xScale(d)))
+        //                 .attr("y", 0)
+        //                 .attr("height", 40)
+        //                 .attr("width", (d) => {
+        //                 if (d == 99) {
+        //                         return 6;
+        //                 }
+        //                 return Math.floor(xScale(d+1)) - Math.floor(xScale(d)) + 1;
+        //                 })
+        //                 .attr("fill", (d) => cScale(d));
+        //         }
+
+        //     drawScale("seq1", d3.interpolate(colorA, colorB));
+			
+		</script>
+                <!-- <svg id="seq1" width="580" height="40" ></svg> -->
+
+	</body>
+</html>

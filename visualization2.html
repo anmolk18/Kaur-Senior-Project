@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Scatterplot with Color</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+			/* No style rules here yet */
+		</style>
+	</head>
+	<body>
+		<script type="text/javascript">
+
+			//Width and height
+			let w = 800;
+			let h = 400;
+			let padding = 50;
+
+            //Create SVG element
+            let svg = d3.select("body")
+                            .append("svg")
+                            .attr("width", w)
+                            .attr("height", h);
+
+			//Create circles
+            d3.csv("Instagram_Suicidality.csv").then ( (dataset) => {
+
+                //Create scale functions
+                let xScale = d3.scaleLinear()
+                                    .domain([0, 2])
+                                    .range([padding, w - padding * 4]);
+                let yScale = d3.scaleLinear()
+                                    .domain([15, 23])
+                                    .range([h - padding, padding]);
+
+                //Define X axis
+                let xAxis = d3.axisBottom()
+                                .scale(xScale)
+                                .ticks(2);
+
+                //Define Y axis
+                let yAxis = d3.axisLeft()
+                                .scale(yScale)
+                                .ticks(4);
+
+                svg.selectAll("circle")
+                    .data(dataset)
+                    .enter()
+                    .append("circle")
+                    .attr("cx", (d)=> {
+                            return (xScale(d.Gender) + (Math.random() * 60 * (Math.random() < .5 ? -1 : 1)));
+                    })
+                    .attr("cy", (d)=> {
+                            return yScale(d.Age);
+                    })
+                    .attr("r", 2)
+                    .attr("fill",(d)=>
+                        {if (d.Lifetime_Suicide_Attempt == '1.00') {
+                            return "red";}
+                        else {return "blue";}})
+                    .on("click", function(event,d) {
+
+                        //Get this circles x/y values, then augment for the tooltip
+                        let xPosition = parseFloat(d3.select(this).attr("cx"));
+                        let yPosition = parseFloat(d3.select(this).attr("cy"));
+
+
+                        //Create the tooltip label
+                        svg.append("text")
+                        .attr("id", "tooltip")
+                        .attr("x", xPosition)
+                        .attr("y", yPosition-25)
+                        .attr("text-anchor", "middle")
+                        .attr("font-family", "sans-serif")
+                        .attr("font-size", "24px")
+                        .attr("font-weight", "bold")
+                        .attr("fill", "black")
+                        .text(d.Gender + ", " + d.Age);
+
+                        })
+                    .on("mouseout", function() {
+
+                        //Remove the tooltip
+                        d3.select("#tooltip").remove();
+
+                        });
+
+                //Create X axis
+                svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(0," + (h - padding) + ")")
+                    .call(xAxis);
+                
+                //Create Y axis
+                svg.append("g")
+                    .attr("class", "axis")
+                    .attr("transform", "translate(" + padding + ",0)")
+                    .call(yAxis);
+
+                svg.append("text")
+                    .attr("x", 250)
+                    .attr("y", 30)
+                    .style("font-size", "22px")
+                    .text("Suicide Attempts by Age and Gender")
+
+                svg.append('circle')
+                    .attr('cx', 55)
+                    .attr('cy', 375)
+                    .attr('r', 2)
+                    .attr('fill', 'red');
+                
+                svg.append("text")
+                    .attr("x", 60)
+                    .attr("y", 380)
+                    .style("font-size", "16px")
+                    .text("Attempted")
+                    .attr("fill", "red")
+                
+                svg.append('circle')
+                    .attr('cx', 56)
+                    .attr('cy', 395)
+                    .attr('r', 2)
+                    .attr('fill', 'blue');
+                
+                svg.append("text")
+                    .attr("x", 60)
+                    .attr("y", 400)
+                    .style("font-size", "16px")
+                    .text("Didn't Attempt")
+                    .attr("fill", "blue")
+
+                svg.append("text")
+                    .attr("class", "x label")
+                    .attr("text-anchor", "start")
+                    .attr("x", 350)
+                    .attr("y", 380)
+                    .text("Gender (1=male, 2=female)");
+
+                svg.append("text")
+                    .attr("class", "y label")
+                    .attr("text-anchor", "end")
+                    .attr("x", -200)
+                    .attr("y", 10)
+                    .attr("dy", "0.5em")
+                    .attr("transform", "rotate(-90)")
+                    .text("Age");
+            })
+		</script>
+	</body>
+</html>

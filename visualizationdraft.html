@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Bar chart of Social Media Times</title>
+		<script type="text/javascript" src="d3.js"></script>
+		<style type="text/css">
+		</style>
+	</head>
+	<body>
+                <h2 style="padding-left: 150px;">Social Media Effect by Age</h1>
+		<script type="text/javascript">
+
+			//Width and height
+			let w = 1000;
+			let h = 800;
+			let barPadding =20;
+			
+			//Create SVG element
+			let svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+            d3.csv("effects.csv").then( (dataset) => {
+                console.log(dataset)
+                svg.selectAll("rect")
+                .data(dataset)
+                .enter()
+                .append("rect")
+                .attr("x", (d, i)=> {
+                        return (100*(i+1));
+                })
+                .attr("y", (d, i)=> {
+                        return (h/2 + barPadding) - 100*d.Average;
+                })
+                .attr("width", 120)
+                .attr("height", (d, i)=> {
+                        return 100*d.Average;
+                })
+                .attr("fill", "blue");
+
+                let xScale = d3.scaleBand()
+                                .domain(dataset.map(d => d.Age))
+                                .range([50, 600])
+                                .padding(1.5)
+
+                let yScale = d3.scaleLinear()
+                                .domain([0, 4])
+                                .range([(h/2 + barPadding), barPadding])
+
+                //Define X axis
+                let xAxis = d3.axisBottom()
+                        .scale(xScale)
+                        .ticks(4);
+
+                let tickLabels = ['0','Negative','No Effect','Positive'];
+
+                //Define Y axis
+                let yAxis = d3.axisLeft()
+                        .scale(yScale)
+                        .ticks(4)
+                        .tickFormat((d,i) => tickLabels[i]);
+
+                svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(0," + (h/2 + barPadding) + ")")
+                        .call(xAxis);
+                
+                //Create Y axis
+                svg.append("g")
+                        .attr("class", "axis")
+                        .attr("transform", "translate(" + 50 + ",0)")
+                        .call(yAxis);
+
+            });
+			
+		</script>
+	</body>
+</html>
