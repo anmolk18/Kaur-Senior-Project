@@ -1,1 +1,1 @@
-# Kaur-Senior-Project
+# Senior Project
